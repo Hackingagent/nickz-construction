@@ -12,6 +12,8 @@ const storage = multer.diskStorage({
       cb(null, path.join(__dirname, '../uploads/projects'));
     } else if (file.fieldname === 'image_url') {
       cb(null, path.join(__dirname, '../uploads/services'));
+    } else if (file.fieldname === 'image') {
+      cb(null, path.join(__dirname, '../uploads/team'));
     } else {
       cb(null, path.join(__dirname, '../uploads'));
     }
@@ -49,3 +51,6 @@ export const uploadServiceImage = upload.single('image_url');
 
 // Multiple images upload for projects
 export const uploadProjectImages = upload.array('images', 10);
+
+// Single image upload for team members
+export const uploadTeamImage = upload.single('image');

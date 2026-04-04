@@ -22,8 +22,8 @@ export const COLORS = {
 };
 
 export const IMAGES = {
-  hero: 'https://d64gsuwffb70l.cloudfront.net/69ca7bf49143ce3e243961ac_1774878226858_65cadb51.jpg',
-  team: 'https://d64gsuwffb70l.cloudfront.net/69ca7bf49143ce3e243961ac_1774878449953_aab02641.jpg',
+  hero: '../../assets/team B.jpeg',
+  team: '../../assets/team B.jpeg',
   teamMembers: [
     'https://d64gsuwffb70l.cloudfront.net/69ca7bf49143ce3e243961ac_1774878537070_a4b8c958.png',
     'https://d64gsuwffb70l.cloudfront.net/69ca7bf49143ce3e243961ac_1774878513812_486fbeb7.png',

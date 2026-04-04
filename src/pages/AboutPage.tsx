@@ -1,18 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import { BRAND, IMAGES } from '@/lib/constants';
 import { Target, Eye, Award, Users, Building2, Globe, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { teamAPI, getImageUrl } from '@/lib/api';
+import type { TeamMember } from '@/lib/types';
 
-const team = [
-  { name: 'Nicholas Tanyi', role: 'Founder & CEO', image: IMAGES.teamMembers[0] },
-  { name: 'Emmanuel Mbarga', role: 'Chief Engineer', image: IMAGES.teamMembers[1] },
-  { name: 'Grace Nkembe', role: 'Project Manager', image: IMAGES.teamMembers[2] },
-  { name: 'Paul Fotso', role: 'Operations Director', image: IMAGES.teamMembers[3] },
-];
+const AboutPage: React.FC = () => {
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const milestones = [
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const data = await teamAPI.getAll();
+        setTeam(data);
+      } catch (error) {
+        console.error('Failed to fetch team:', error);
+      }
+      setLoading(false);
+    };
+    fetchTeam();
+  }, []);
+
+  const milestones = [
   { year: '2010', title: 'Company Founded', desc: 'Nickztech Construction was established in Douala, Cameroon.' },
   { year: '2013', title: 'First Major Project', desc: 'Completed our first commercial building project in Douala.' },
   { year: '2016', title: 'Regional Expansion', desc: 'Expanded operations to Yaoundé and other major cities.' },
@@ -21,7 +33,6 @@ const milestones = [
   { year: '2025', title: 'Industry Leader', desc: 'Recognized as one of Cameroon\'s top construction firms.' },
 ];
 
-const AboutPage: React.FC = () => {
   return (
     <Layout>
       {/* Hero */}
@@ -134,14 +145,15 @@ const AboutPage: React.FC = () => {
           </ScrollReveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
+              <ScrollReveal key={member.id} delay={i * 100}>
                 <div className="group text-center">
                   <div className="relative w-48 h-48 mx-auto mb-4 rounded-2xl overflow-hidden">
-                    <img src={member.image} alt={member.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={getImageUrl(member.image_url)} alt={member.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2F8F]/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <h4 className="font-bold text-[#1F2F8F] text-lg">{member.name}</h4>
                   <p className="text-[#F5A623] text-sm font-medium">{member.role}</p>
+                  {member.bio && <p className="text-gray-600 text-sm mt-2">{member.bio}</p>}
                 </div>
               </ScrollReveal>
             ))}

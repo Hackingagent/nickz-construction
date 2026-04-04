@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { BRAND } from '@/lib/constants';
-import { LayoutDashboard, Wrench, FolderOpen, Star, MessageSquare, Users, Settings, LogOut, Menu, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Wrench, FolderOpen, Star, MessageSquare, Users, Settings, LogOut, Menu, X, ChevronRight, User } from 'lucide-react';
 
 const sidebarLinks = [
   { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -10,6 +10,7 @@ const sidebarLinks = [
   { label: 'Projects', path: '/admin/projects', icon: FolderOpen },
   { label: 'Reviews', path: '/admin/reviews', icon: Star },
   { label: 'Contacts', path: '/admin/contacts', icon: MessageSquare },
+  { label: 'Team', path: '/admin/team', icon: User },
   { label: 'Users', path: '/admin/users', icon: Users },
   { label: 'Settings', path: '/admin/settings', icon: Settings },
 ];

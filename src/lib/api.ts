@@ -23,7 +23,7 @@ export const apiRequest = async (endpoint, options = {}) => {
   const config: RequestInit = {
     headers: {
       'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string>),
+      ...(options.headers as Record<string, string> || {}),
     },
     ...options,
   };
@@ -233,6 +233,53 @@ export const settingsAPI = {
   }),
   
   delete: (key) => apiRequest(`/settings/${key}`, {
+    method: 'DELETE',
+  }),
+};
+
+// Team API
+export const teamAPI = {
+  getAll: () => apiRequest('/team'),
+  
+  getAllAdmin: () => apiRequest('/team/admin/all'),
+  
+  create: (teamData) => {
+    const formData = new FormData();
+    formData.append('name', teamData.name);
+    formData.append('role', teamData.role);
+    formData.append('bio', teamData.bio || '');
+    formData.append('sort_order', teamData.sort_order?.toString() || '0');
+    
+    if (teamData.imageFile) {
+      formData.append('image', teamData.imageFile);
+    }
+    
+    return apiRequest('/team', {
+      method: 'POST',
+      body: formData,
+      headers: {}, // Let browser set Content-Type for FormData
+    });
+  },
+  
+  update: (id, teamData) => {
+    const formData = new FormData();
+    formData.append('name', teamData.name);
+    formData.append('role', teamData.role);
+    formData.append('bio', teamData.bio || '');
+    formData.append('sort_order', teamData.sort_order?.toString() || '0');
+    
+    if (teamData.imageFile) {
+      formData.append('image', teamData.imageFile);
+    }
+    
+    return apiRequest(`/team/${id}`, {
+      method: 'PUT',
+      body: formData,
+      headers: {}, // Let browser set Content-Type for FormData
+    });
+  },
+  
+  delete: (id) => apiRequest(`/team/${id}`, {
     method: 'DELETE',
   }),
 };

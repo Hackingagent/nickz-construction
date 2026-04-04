@@ -15,6 +15,7 @@ import reviewRoutes from './routes/reviews.js';
 import contactRoutes from './routes/contacts.js';
 import quoteRoutes from './routes/quotes.js';
 import settingsRoutes from './routes/settings.js';
+import teamRoutes from './routes/team.js';
 
 // Configure dotenv
 dotenv.config({ path: 'c:\\Users\\DELL\\Desktop\\Nickz Construction\\backend\\.env' });
@@ -56,6 +57,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/quotes', quoteRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/team', teamRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

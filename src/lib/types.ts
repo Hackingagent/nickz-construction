@@ -83,3 +83,15 @@ export interface AdminProfile {
   created_at: string;
   updated_at: string;
 }
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  image_url: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
