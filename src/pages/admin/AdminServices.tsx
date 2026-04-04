@@ -3,6 +3,7 @@ import { servicesAPI } from '@/lib/api';
 import type { Service } from '@/lib/types';
 import { Plus, Pencil, Trash2, X, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getImageUrl } from '@/lib/api';
 
 const emptyService = { title: '', slug: '', short_description: '', description: '', image_url: '', benefits: '', process_steps: '', icon: 'building', sort_order: 0, imageFile: null as File | null };
 
@@ -213,7 +214,7 @@ const AdminServices: React.FC = () => {
                   <tr key={service.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {service.image_url && <img src={service.image_url} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                        {service.image_url && <img src={getImageUrl(service.image_url)} alt="" className="w-10 h-10 rounded-lg object-cover" />}
                         <span className="font-medium text-sm text-gray-900">{service.title}</span>
                       </div>
                     </td>

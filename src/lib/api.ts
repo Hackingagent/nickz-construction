@@ -1,6 +1,19 @@
 // API base URL
 const API_BASE_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Helper to get full image URL
+export const getImageUrl = (imagePath: string | null | undefined) => {
+  if (!imagePath) return '';
+  // If it's already a full URL, return as is
+  if (imagePath.startsWith('http')) return imagePath;
+  // If it starts with /uploads, prefix with backend base URL (without /api)
+  if (imagePath.startsWith('/uploads')) {
+    return API_BASE_URL.replace('/api', '') + imagePath;
+  }
+  // Otherwise, assume it's a relative path
+  return API_BASE_URL.replace('/api', '') + '/' + imagePath;
+};
+
 // Generic API request function
 export const apiRequest = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;

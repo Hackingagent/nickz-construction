@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { servicesAPI, getImageUrl } from '@/lib/api';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import type { Service } from '@/lib/types';
@@ -17,8 +17,13 @@ const ServiceDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await supabase.from('services').select('*').eq('slug', slug).single();
-      setService(data);
+      try {
+        if (!slug) return;
+        const data = await servicesAPI.getBySlug(slug);
+        setService(data);
+      } catch (error) {
+        console.error('Failed to fetch service:', error);
+      }
       setLoading(false);
     };
     fetch();
@@ -74,7 +79,7 @@ const ServiceDetailPage: React.FC = () => {
       {/* Hero */}
       <section className="relative py-24 bg-gradient-to-br from-[#1F2F8F] to-[#0D1B4A] overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <img src={service.image_url} alt="" className="w-full h-full object-cover" />
+          <img src={getImageUrl(service.image_url)} alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{service.title}</h1>
@@ -97,7 +102,7 @@ const ServiceDetailPage: React.FC = () => {
               <Link to="/services" className="inline-flex items-center gap-2 text-[#1F2F8F] hover:text-[#F5A623] mb-6 font-medium">
                 <ArrowLeft className="w-4 h-4" /> Back to Services
               </Link>
-              <img src={service.image_url} alt={service.title} className="w-full h-72 md:h-96 object-cover rounded-xl mb-8" />
+              <img src={getImageUrl(service.image_url)} alt={service.title} className="w-full h-72 md:h-96 object-cover rounded-xl mb-8" />
               <ScrollReveal>
                 <h2 className="text-2xl font-bold text-[#1F2F8F] mb-4">About This Service</h2>
                 <p className="text-gray-600 leading-relaxed mb-8">{service.description}</p>

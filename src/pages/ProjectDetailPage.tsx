@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { projectsAPI, getImageUrl } from '@/lib/api';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import type { Project } from '@/lib/types';
@@ -17,8 +17,13 @@ const ProjectDetailPage: React.FC = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await supabase.from('projects').select('*').eq('slug', slug).single();
-      setProject(data);
+      try {
+        if (!slug) return;
+        const data = await projectsAPI.getBySlug(slug);
+        setProject(data);
+      } catch (error) {
+        console.error('Failed to fetch project:', error);
+      }
       setLoading(false);
     };
     fetch();
@@ -68,7 +73,7 @@ const ProjectDetailPage: React.FC = () => {
       {/* Hero */}
       <section className="relative py-24 bg-gradient-to-br from-[#1F2F8F] to-[#0D1B4A] overflow-hidden">
         <div className="absolute inset-0 opacity-20">
-          <img src={project.images?.[0]} alt="" className="w-full h-full object-cover" />
+          <img src={getImageUrl(project.images?.[0])} alt="" className="w-full h-full object-cover" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 text-center">
           <span className="inline-block px-4 py-1.5 bg-[#F5A623] text-white text-sm font-semibold rounded-full mb-4">{project.category}</span>
@@ -107,7 +112,7 @@ const ProjectDetailPage: React.FC = () => {
           {/* Image Gallery */}
           <div className="mb-12">
             <div className="rounded-xl overflow-hidden mb-4 h-[400px] md:h-[500px]">
-              <img src={project.images?.[selectedImage]} alt={project.title} className="w-full h-full object-cover" />
+              <img src={getImageUrl(project.images?.[selectedImage])} alt={project.title} className="w-full h-full object-cover" />
             </div>
             {project.images?.length > 1 && (
               <div className="flex gap-3 overflow-x-auto pb-2">
@@ -119,7 +124,7 @@ const ProjectDetailPage: React.FC = () => {
                       i === selectedImage ? 'border-[#F5A623] ring-2 ring-[#F5A623]/30' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <img src={getImageUrl(img)} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>

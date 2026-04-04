@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { servicesAPI } from '@/lib/api';
+import { servicesAPI, getImageUrl } from '@/lib/api';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import { IMAGES } from '@/lib/constants';
@@ -67,7 +67,7 @@ const ServicesPage: React.FC = () => {
                     className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 block h-full"
                   >
                     <div className="h-56 overflow-hidden relative">
-                      <img src={service.image_url} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <img src={getImageUrl(service.image_url)} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                     </div>
                     <div className="p-6">

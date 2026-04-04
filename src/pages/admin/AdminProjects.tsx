@@ -3,6 +3,7 @@ import { projectsAPI } from '@/lib/api';
 import type { Project } from '@/lib/types';
 import { Plus, Pencil, Trash2, X, Save, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { getImageUrl } from '@/lib/api';
 
 const emptyProject = { title: '', slug: '', category: 'Residential', short_description: '', description: '', location: '', highlights: '', images: '', is_featured: false, completed_date: '', imageFiles: [] as File[] };
 
@@ -211,7 +212,7 @@ const AdminProjects: React.FC = () => {
                   <tr key={project.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {project.images?.[0] && <img src={project.images[0]} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                        {project.images?.[0] && <img src={getImageUrl(project.images[0])} alt="" className="w-10 h-10 rounded-lg object-cover" />}
                         <span className="font-medium text-sm text-gray-900">{project.title}</span>
                       </div>
                     </td>

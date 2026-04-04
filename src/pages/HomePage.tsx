@@ -5,7 +5,7 @@ import type { Service, Project, Review } from '@/lib/types';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import { ArrowRight, Building2, Hammer, HardHat, Award, Users, Globe, Star, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { servicesAPI, projectsAPI, reviewsAPI } from '@/lib/api';
+import { servicesAPI, projectsAPI, reviewsAPI, getImageUrl } from '@/lib/api';
 
 const HomePage: React.FC = () => {
   const [services, setServices] = useState<Service[]>([]);
@@ -128,7 +128,7 @@ const HomePage: React.FC = () => {
                   className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 block h-full"
                 >
                   <div className="h-48 overflow-hidden">
-                    <img src={service.image_url} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <img src={getImageUrl(service.image_url)} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                   </div>
                   <div className="p-6">
                     <div className="w-12 h-12 bg-[#1F2F8F]/10 rounded-lg flex items-center justify-center text-[#1F2F8F] mb-4 group-hover:bg-[#F5A623] group-hover:text-white transition-colors">
@@ -167,7 +167,7 @@ const HomePage: React.FC = () => {
                   to={`/portfolio/${project.slug}`}
                   className="group relative rounded-xl overflow-hidden h-72 md:h-80 block"
                 >
-                  <img src={project.images?.[0]} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <img src={getImageUrl(project.images?.[0])} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1F2F8F]/90 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6">
                     <span className="inline-block px-3 py-1 bg-[#F5A623] text-white text-xs font-semibold rounded-full mb-3">{project.category}</span>
