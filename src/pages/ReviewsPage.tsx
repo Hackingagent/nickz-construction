@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { reviewsAPI } from '@/lib/api';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import { IMAGES } from '@/lib/constants';
@@ -18,8 +18,12 @@ const ReviewsPage: React.FC = () => {
 
   useEffect(() => {
     const fetch = async () => {
-      const { data } = await supabase.from('reviews').select('*').eq('is_approved', true).order('created_at', { ascending: false });
-      if (data) setReviews(data);
+      try {
+        const data = await reviewsAPI.getAll();
+        setReviews(data);
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+      }
       setLoading(false);
     };
     fetch();
@@ -32,22 +36,21 @@ const ReviewsPage: React.FC = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from('reviews').insert({
-      client_name: form.client_name,
-      company: form.company || null,
-      rating: form.rating,
-      review_text: form.review_text,
-      location: form.location || null,
-      is_approved: false,
-    });
-    setSubmitting(false);
-    if (error) {
-      toast({ title: 'Error', description: 'Failed to submit review.', variant: 'destructive' });
-    } else {
+    try {
+      await reviewsAPI.create({
+        client_name: form.client_name,
+        company: form.company || '',
+        rating: form.rating,
+        review_text: form.review_text,
+        location: form.location || '',
+      });
       toast({ title: 'Thank you!', description: 'Your review has been submitted and is pending approval.' });
       setForm({ client_name: '', company: '', rating: 5, review_text: '', location: '' });
       setShowForm(false);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to submit review.', variant: 'destructive' });
     }
+    setSubmitting(false);
   };
 
   const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : '0';

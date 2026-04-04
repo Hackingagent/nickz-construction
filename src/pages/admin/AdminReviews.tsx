@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { reviewsAPI } from '@/lib/api';
 import type { Review } from '@/lib/types';
 import { CheckCircle, XCircle, Trash2, Star, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -11,44 +11,51 @@ const AdminReviews: React.FC = () => {
   const { toast } = useToast();
 
   const fetchReviews = async () => {
-    let query = supabase.from('reviews').select('*').order('created_at', { ascending: false });
-    if (filter === 'pending') query = query.eq('is_approved', false);
-    if (filter === 'approved') query = query.eq('is_approved', true);
-    const { data } = await query;
-    if (data) setReviews(data);
+    try {
+      let data;
+      if (filter === 'pending') {
+        data = await reviewsAPI.getAllPending();
+      } else if (filter === 'approved') {
+        data = await reviewsAPI.getAllApproved();
+      } else {
+        data = await reviewsAPI.getAllAdmin();
+      }
+      setReviews(data);
+    } catch (error) {
+      console.error('Failed to fetch reviews:', error);
+    }
     setLoading(false);
   };
 
   useEffect(() => { fetchReviews(); }, [filter]);
 
   const handleApprove = async (id: string) => {
-    const { error } = await supabase.from('reviews').update({ is_approved: true }).eq('id', id);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
+    try {
+      await reviewsAPI.approve(id);
       toast({ title: 'Approved', description: 'Review has been approved and is now visible.' });
       fetchReviews();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to approve review.', variant: 'destructive' });
     }
   };
 
   const handleReject = async (id: string) => {
-    const { error } = await supabase.from('reviews').update({ is_approved: false }).eq('id', id);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
+    try {
+      await reviewsAPI.reject(id);
       toast({ title: 'Rejected', description: 'Review has been hidden from public view.' });
       fetchReviews();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to reject review.', variant: 'destructive' });
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to permanently delete this review?')) return;
-    const { error } = await supabase.from('reviews').delete().eq('id', id);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: 'Deleted', description: 'Review deleted permanently.' });
+    try {
+      await reviewsAPI.delete(id);
+      toast({ title: 'Deleted', description: 'Review has been deleted permanently.' });
       fetchReviews();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to delete review.', variant: 'destructive' });
     }
   };
 

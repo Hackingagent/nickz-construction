@@ -8,10 +8,12 @@ export const getImageUrl = (imagePath: string | null | undefined) => {
   if (imagePath.startsWith('http')) return imagePath;
   // If it starts with /uploads, prefix with backend base URL (without /api)
   if (imagePath.startsWith('/uploads')) {
-    return API_BASE_URL.replace('/api', '') + imagePath;
+    const baseUrl = API_BASE_URL.replace('/api', '').replace('https://nickz-construction.vercel.app/api', 'https://nickz-construction.vercel.app');
+    return baseUrl + imagePath;
   }
   // Otherwise, assume it's a relative path
-  return API_BASE_URL.replace('/api', '') + '/' + imagePath;
+  const baseUrl = API_BASE_URL.replace('/api', '').replace('https://nickz-construction.vercel.app/api', 'https://nickz-construction.vercel.app');
+  return baseUrl + '/' + imagePath;
 };
 
 // Generic API request function
@@ -142,6 +144,10 @@ export const reviewsAPI = {
   
   getAllAdmin: () => apiRequest('/reviews/admin/all'),
   
+  getAllPending: () => apiRequest('/reviews/admin/pending'),
+  
+  getAllApproved: () => apiRequest('/reviews/admin/approved'),
+  
   create: (reviewData) => apiRequest('/reviews', {
     method: 'POST',
     body: JSON.stringify(reviewData),
@@ -150,6 +156,14 @@ export const reviewsAPI = {
   update: (id, reviewData) => apiRequest(`/reviews/${id}`, {
     method: 'PUT',
     body: JSON.stringify(reviewData),
+  }),
+  
+  approve: (id) => apiRequest(`/reviews/${id}/approve`, {
+    method: 'PATCH',
+  }),
+  
+  reject: (id) => apiRequest(`/reviews/${id}/reject`, {
+    method: 'PATCH',
   }),
   
   delete: (id) => apiRequest(`/reviews/${id}`, {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { settingsAPI } from '@/lib/api';
 import { Save, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -10,11 +10,13 @@ const AdminSettings: React.FC = () => {
   const { toast } = useToast();
 
   const fetchSettings = async () => {
-    const { data } = await supabase.from('site_settings').select('*');
-    if (data) {
+    try {
+      const data = await settingsAPI.getAll();
       const map: Record<string, string> = {};
       data.forEach(s => { map[s.key] = s.value; });
       setSettings(map);
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
     }
     setLoading(false);
   };
@@ -23,12 +25,16 @@ const AdminSettings: React.FC = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    const promises = Object.entries(settings).map(([key, value]) =>
-      supabase.from('site_settings').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' })
-    );
-    await Promise.all(promises);
+    try {
+      const promises = Object.entries(settings).map(([key, value]) =>
+        settingsAPI.set(key, value)
+      );
+      await Promise.all(promises);
+      toast({ title: 'Success', description: 'Settings have been saved successfully!' });
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to save settings.', variant: 'destructive' });
+    }
     setSaving(false);
-    toast({ title: 'Settings Saved', description: 'Site settings have been updated successfully.' });
   };
 
   const updateSetting = (key: string, value: string) => {

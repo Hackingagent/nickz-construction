@@ -9,7 +9,12 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const reviews = await Review.find({ is_approved: true }).sort({ created_at: -1 });
-    res.json(reviews);
+    // Transform _id to id for frontend compatibility
+    const transformedReviews = reviews.map(review => ({
+      ...review.toObject(),
+      id: review._id.toString()
+    }));
+    res.json(transformedReviews);
   } catch (error) {
     console.error('Get reviews error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -20,7 +25,12 @@ router.get('/', async (req, res) => {
 router.get('/admin/all', authMiddleware, async (req, res) => {
   try {
     const reviews = await Review.find().sort({ created_at: -1 });
-    res.json(reviews);
+    // Transform _id to id for frontend compatibility
+    const transformedReviews = reviews.map(review => ({
+      ...review.toObject(),
+      id: review._id.toString()
+    }));
+    res.json(transformedReviews);
   } catch (error) {
     console.error('Get all reviews error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -63,7 +73,10 @@ router.post('/', [
     await review.save();
     res.status(201).json({
       message: 'Review submitted successfully. It will be visible after approval.',
-      review
+      review: {
+        ...review.toObject(),
+        id: review._id.toString()
+      }
     });
   } catch (error) {
     console.error('Create review error:', error);
@@ -136,6 +149,86 @@ router.patch('/:id/approve', authMiddleware, async (req, res) => {
     });
   } catch (error) {
     console.error('Toggle review approval error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get pending reviews (admin)
+router.get('/admin/pending', authMiddleware, async (req, res) => {
+  try {
+    const reviews = await Review.find({ is_approved: false }).sort({ created_at: -1 });
+    // Transform _id to id for frontend compatibility
+    const transformedReviews = reviews.map(review => ({
+      ...review.toObject(),
+      id: review._id.toString()
+    }));
+    res.json(transformedReviews);
+  } catch (error) {
+    console.error('Get pending reviews error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Get approved reviews (admin)
+router.get('/admin/approved', authMiddleware, async (req, res) => {
+  try {
+    const reviews = await Review.find({ is_approved: true }).sort({ created_at: -1 });
+    // Transform _id to id for frontend compatibility
+    const transformedReviews = reviews.map(review => ({
+      ...review.toObject(),
+      id: review._id.toString()
+    }));
+    res.json(transformedReviews);
+  } catch (error) {
+    console.error('Get approved reviews error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Approve review (admin)
+router.patch('/:id/approve', authMiddleware, async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    review.is_approved = true;
+    await review.save();
+
+    res.json({
+      message: 'Review approved successfully',
+      review: {
+        ...review.toObject(),
+        id: review._id.toString()
+      }
+    });
+  } catch (error) {
+    console.error('Approve review error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Reject review (admin)
+router.patch('/:id/reject', authMiddleware, async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    review.is_approved = false;
+    await review.save();
+
+    res.json({
+      message: 'Review rejected successfully',
+      review: {
+        ...review.toObject(),
+        id: review._id.toString()
+      }
+    });
+  } catch (error) {
+    console.error('Reject review error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

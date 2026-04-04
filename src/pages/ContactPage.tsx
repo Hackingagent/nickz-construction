@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
+import { contactsAPI } from '@/lib/api';
 import Layout from '@/components/Layout';
 import ScrollReveal from '@/components/ScrollReveal';
 import { BRAND, IMAGES } from '@/lib/constants';
@@ -19,20 +19,20 @@ const ContactPage: React.FC = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from('contacts').insert({
-      name: form.name,
-      email: form.email,
-      phone: form.phone || null,
-      subject: form.subject || null,
-      message: form.message,
-    });
-    setSubmitting(false);
-    if (error) {
-      toast({ title: 'Error', description: 'Failed to send message. Please try again.', variant: 'destructive' });
-    } else {
-      toast({ title: 'Message Sent!', description: 'Thank you for contacting us. We will respond within 24 hours.' });
+    try {
+      await contactsAPI.create({
+        name: form.name,
+        email: form.email,
+        phone: form.phone || '',
+        subject: form.subject || '',
+        message: form.message,
+      });
+      toast({ title: 'Success', description: 'Your message has been sent successfully!' });
       setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to send message. Please try again.', variant: 'destructive' });
     }
+    setSubmitting(false);
   };
 
   return (
