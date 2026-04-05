@@ -8,11 +8,11 @@ export const getImageUrl = (imagePath: string | null | undefined) => {
   if (imagePath.startsWith('http')) return imagePath;
   // If it starts with /uploads, prefix with backend base URL (without /api)
   if (imagePath.startsWith('/uploads')) {
-    const baseUrl = API_BASE_URL.replace('/api', '').replace('https://nickz-construction.vercel.app/api', 'https://nickz-construction.vercel.app');
+    const baseUrl = API_BASE_URL.replace('/api', '').replace('https://nickz-construction-one.vercel.app/api', 'https://nickz-construction-one.vercel.app');
     return baseUrl + imagePath;
   }
   // Otherwise, assume it's a relative path
-  const baseUrl = API_BASE_URL.replace('/api', '').replace('https://nickz-construction.vercel.app/api', 'https://nickz-construction.vercel.app');
+  const baseUrl = API_BASE_URL.replace('/api', '').replace('https://nickz-construction-one.vercel.app/api', 'https://nickz-construction-one.vercel.app');
   return baseUrl + '/' + imagePath;
 };
 
