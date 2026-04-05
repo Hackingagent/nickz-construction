@@ -2,7 +2,7 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "https://nickz-construction-backend2.vercel.app/api/$1"
+            "destination": "https://nickz-construction-one.vercel.app/api/$1"
         },
         {
             "source": "/(.*)",
@@ -30,7 +30,7 @@
     ],
     "build": {
         "env": {
-            "VITE_API_URL": "https://nickz-construction-backend2.vercel.app/api"
+            "VITE_API_URL": "https://nickz-construction-one.vercel.app/api"
         }
     }
 }
