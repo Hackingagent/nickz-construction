@@ -32,6 +32,7 @@ app.use(morgan('dev'));
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:5173',
+    'https://nickz-construction.vercel.app',
     'http://10.118.145.124:8080',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
