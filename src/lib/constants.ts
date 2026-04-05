@@ -22,8 +22,8 @@ export const COLORS = {
 };
 
 export const IMAGES = {
-  hero: '../../assets/team B.jpeg',
-  team: '../../assets/team B.jpeg',
+  hero: '../../assets/hero.jpeg',
+  team: '../assets/hero.jpeg',
   teamMembers: [
     'https://d64gsuwffb70l.cloudfront.net/69ca7bf49143ce3e243961ac_1774878537070_a4b8c958.png',
     'https://d64gsuwffb70l.cloudfront.net/69ca7bf49143ce3e243961ac_1774878513812_486fbeb7.png',
