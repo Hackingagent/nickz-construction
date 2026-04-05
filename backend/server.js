@@ -17,8 +17,10 @@ import quoteRoutes from './routes/quotes.js';
 import settingsRoutes from './routes/settings.js';
 import teamRoutes from './routes/team.js';
 
-// Configure dotenv
-// dotenv.config({ path: 'c:\\Users\\DELL\\Desktop\\Nickz Construction\\backend\\.env' });
+// Configure dotenv - Only for local development
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: 'c:\\Users\\DELL\\Desktop\\Nickz Construction\\backend\\.env' });
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,13 +29,13 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-// app.use(helmet()); // Temporarily disabled for debugging
 app.use(morgan('dev'));
 
-// Configure CORS - Use ONLY this, remove manual middleware
+// Configure CORS
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:5173',
   'https://nickz-construction-46w1.vercel.app',
+  'https://nickz-construction.vercel.app', // Add your main frontend URL
   'http://10.118.145.124:8080',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
@@ -58,7 +60,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-  optionsSuccessStatus: 200 // For legacy browsers
+  optionsSuccessStatus: 200
 }));
 
 // Body parsing middleware
@@ -78,9 +80,41 @@ app.use('/api/quotes', quoteRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/team', teamRoutes);
 
-// Health check
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Database status endpoint
+app.get('/api/db-status', async (req, res) => {
+  try {
+    const dbState = mongoose.connection.readyState;
+    const states = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    };
+    
+    res.json({
+      success: true,
+      status: states[dbState] || 'unknown',
+      readyState: dbState,
+      host: mongoose.connection.host || 'not connected',
+      database: mongoose.connection.name || 'not connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // Error handling middleware
@@ -94,19 +128,30 @@ app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Database connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
+// Database connection (without app.listen for Vercel)
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 10000,
+  socketTimeoutMS: 45000,
+})
+.then(() => {
+  console.log('✅ Connected to MongoDB');
+  console.log('📊 Database:', mongoose.connection.name);
+  console.log('🔗 Host:', mongoose.connection.host);
+  
+  // Only start server locally, not on Vercel
+  if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server running on port ${PORT}`);
-      console.log(`Accessible at: http://0.0.0.0:${PORT}`);
-      console.log(`Local access: http://localhost:${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error('Database connection error:', error);
+  }
+})
+.catch((error) => {
+  console.error('❌ Database connection error:', error);
+  // Don't exit process on Vercel
+  if (process.env.NODE_ENV !== 'production') {
     process.exit(1);
-  });
+  }
+});
 
+// Export for Vercel
 export default app;
